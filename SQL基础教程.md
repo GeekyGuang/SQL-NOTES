@@ -187,7 +187,93 @@ BEGIN TRANSACTION;
 ROLLBACK TRANSACTION one; 
  ```
 
- 26. 
+ 26. 视图是虚拟的表，存储的是SELECT语句， 应该将经常使用的SELECT语句做成视图。
+```
+-- 视图的列名可以省略
+CREATE VIEW 视图名称(<视图列名1>, <视图列名2>, ……)
+AS
+<SELECT语句>
+```
+```
+-- 列名一一对应，就像创建一张表
+CREATE VIEW ProductSum (product_type, cnt_product) 
+AS
+SELECT product_type, COUNT(*)
+FROM Product
+GROUP BY product_type;
+```
+> 看见代码，在心里模拟敲一遍才能记住细节
+
+```
+-- 删除视图
+DROP VIEW ProductSum;
+```
+
+27. 子查询
+> 一言以蔽之，子查询就是一张一次性视图（SELECT语句）。与视图不同，子查询在SELECT语句执行完毕之后就会消失。
+
+> 子查询就是将用来定义视图的SELECT语句直接用于FROM子句当中
+
+```
+SELECT product_type, cnt_product
+FROM (SELECT product_type, COUNT(*) AS cnt_product
+      FROM Product
+	  GROUP BY product_type) AS ProdcutSum;  -- 子查询必须定义别名，AS可省略
+```
+
+```
+-- 执行顺序
+-- ① 首先执行FROM 子句中的SELECT 语句（子查询）
+SELECT product_type, COUNT(*) AS cnt_product
+FROM Product
+GROUP BY product_type;
+-- ② 根据①的结果执行外层的SELECT 语句
+SELECT product_type, cnt_product
+FROM ProductSum;
+```
+
+28. 标量子查询：即返回单一值的子查询。
+```
+-- WHERE子句不能使用聚合函数，可以使用标量子查询
+SELECT *
+FROM Product
+WHERE sale_price > (SELECT AVG(sale_price) 
+                      FROM Product);
+```
+29. 关联子查询: 在细分的组内进行比较时，需要使用关联子查询。
+```
+SELECT product_type, product_name, sale_price
+FROM Product p1
+WHERE sale_price > (SELECT AVG(sale_price)
+                    FROM product p2
+					WHERE p1.product_type = p2.product_type  -- 指定比较分组
+					GROUP BY product_type)
+```
+> 先进行GROUP BY分组，后用WHERE创建关联
+
+```
+CREATE VIEW AvgPriceByType
+AS
+SELECT product_id, product_name, product_type, sale_price,
+		(SELECT AVG(sale_price)
+		 FROM product AS p2
+		 WHERE p1.product_type = p2.product_type
+		 GROUP BY product_type) AS avg_sale_price
+FROM product AS p1;
+```
+30. COALESCE
+```
+SELECT COALESCE(NULL, 'HELLO', NULL);  -- 合并
+```
+
+31. 
+
+
+
+
+
+
+
 
 
 
