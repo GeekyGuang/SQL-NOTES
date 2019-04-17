@@ -105,6 +105,94 @@ ORDER BY sp, id;  -- 对多个列先后顺序排序
 
 21. INSERT省略一列未赋值，若未设定默认值，则会插入null。
 
+22. INSERT INTO ... SELECT复制查询的数据插入到另一张表
+```
+-- 将商品表中的数据复制到商品复制表中
+INSERT INTO ProductCopy (product_id, product_name, product_type, 
+sale_price, purchase_price, regist_date)
+SELECT product_id, product_name, product_type, sale_price, 
+purchase_price, regist_date
+FROM Product;
+```
+> 复制表时有可能违反主键约束
+
+23. DELETE
+```
+DELETE FROM <表名>
+WHERE <条件>;
+
+-- TRUNCATE <表名>; 只能用来清空一张表，速度更快
+```
+
+24. UPDATE
+```
+UPDATE <表名>
+SET <列名> = <表达式>
+WHERE <条件>;
+
+-- UPDATE多列
+-- 使用逗号对列进行分隔排列
+UPDATE Product
+SET sale_price = sale_price * 10,
+purchase_price = purchase_price / 2
+WHERE product_type = '厨房用具';
+```
+
+```
+UPDATE ProductMargin 
+SET sale_price = 3000,
+    margin = sale_price - purchase_price  -- 这里的sale_price不会被改成3000，必须分开UPDATE
+WHERE product_name = '菜刀';
+```
+
+25. 事务：以一系列DML语句为一个单元，有开始和结束
+```
+事务开始语句（BEGIN TRANSACTION）;
+DML语句①;
+DML语句②;
+DML语句③;
+.. .
+事务结束语句（COMMIT或者ROLLBACK）;
+```
+ 
+ > SQL Server是自动提交模式，每一条语句都是一个事务，若没有BEGIN TRANSACTION，则无法ROLLBACK。
+
+ ```
+ BEGIN TRANSACTION;  -- 先执行事务开始语句，后面的语句可以逐条执行
+  
+  UPDATE Product 
+  SET sale_price = sale_price - 100
+  WHERE product_name ='菜刀';
+
+-- COMMIT; --如果COMMIT了就不能ROLLBACK
+ROLLBACK;  -- 不论BEGIN后执行了多少语句，ROLLBACK都会回到BEGIN开始前
+ ```
+
+ ```
+ -- 设置保留点 SAVE TRANSACTION <名字>
+ -- 回滚 ROLLBACK TRANSACTION <名字>
+BEGIN TRANSACTION; 
+  
+  UPDATE Product 
+  SET sale_price = sale_price - 100
+  WHERE product_name ='菜刀';
+
+  SAVE TRANSACTION one;  -- 设置保留点
+
+  UPDATE Product 
+  SET sale_price = sale_price - 100
+  WHERE product_name ='打孔器';
+
+-- ROLLBACK必须指明保留点，不然会回退到BEGIN
+ROLLBACK TRANSACTION one; 
+ ```
+
+ 26. 
+
+
+
+
+
 
 
 

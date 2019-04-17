@@ -1,27 +1,20 @@
-CREATE TABLE ProductIns
-(product_id		CHAR(4)		NOT NULL,
- product_name   VARCHAR(100) NOT NULL,
- product_type   VARCHAR(32)  NOT NULL,
- sale_price     INTEGER		DEFAULT 0,
- purchase_price INTEGER     ,
- regist_date	DATE,
- PRIMARY KEY(product_id)
-);
-
-INSERT INTO ProductIns(product_id, product_name, product_type, sale_price, purchase_price)
-VALUES('005', 'T恤衫', '衣服', 1000, 500);
-
-INSERT INTO ProductIns VALUES ('0002', '打孔器', '办公用品', 500, 320, '2009-09-11'),
-                              ('0003', '运动T恤', '衣服', 4000, 2800, NULL),
-                              ('0004', '菜刀', '厨房用具', 3000, 2800, '2009-09-20');
-SELECT *
-FROM ProductIns;
-
-CREATE TABLE ProductCopy
+-- 商品利润表
+CREATE TABLE ProductMargin
 (product_id CHAR(4) NOT NULL,
 product_name VARCHAR(100) NOT NULL,
-product_type VARCHAR(32) NOT NULL,
-sale_price INTEGER ,
-purchase_price INTEGER ,
-regist_date DATE ,
-PRIMARY KEY (product_id));
+sale_price INTEGER,
+purchase_price INTEGER,
+margin INTEGER,
+PRIMARY KEY(product_id));
+
+INSERT INTO ProductMargin(product_id, product_name, sale_price, purchase_price, margin)
+SELECT product_id, product_name, sale_price, purchase_price, sale_price - purchase_price
+FROM Product;
+
+SELECT *
+FROM dbo.ProductMargin;
+
+UPDATE ProductMargin 
+SET sale_price = 3000,
+    margin = sale_price - purchase_price  -- 这里的sale_price不会被改成3000，必须分开UPDATE
+WHERE product_name = '菜刀';
