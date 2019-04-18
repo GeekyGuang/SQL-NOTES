@@ -6,3 +6,18 @@ SELECT ROUND(@m, @n), '四舍五入'
 union
 SELECT LEN(@m % @n), '取余长度'
 
+SELECT LOWER('skdDKWOIdksoid')
+
+SELECT CAST(CURRENT_TIMESTAMP AS DATE)
+SELECT CAST(CURRENT_TIMESTAMP AS TIME)
+SELECT CURRENT_TIMESTAMP,
+       DATEPART(YEAR, CURRENT_TIMESTAMP) AS YEAR;
+
+SELECT COALESCE(NULL, 'HELLO', NULL);  -- 合并
+
+-- 习题6.2
+
+SELECT SUM(CASE WHEN sale_price <= 1000 THEN 1 else 0 end) AS low_price,
+       SUM(CASE WHEN sale_price BETWEEN 1001 AND 3000 THEN 1 else 0 end) AS mid_price,
+	   SUM(CASE WHEN sale_price > 3000 THEN 1 else 0 end) AS high_price
+FROM product;

@@ -265,8 +265,125 @@ FROM product AS p1;
 ```
 SELECT COALESCE(NULL, 'HELLO', NULL);  -- 合并
 ```
+```
+-- 若是NULL,则替换为'不确定'
+SELECT COALESCE(SP.shop_id,'不确定')AS shop_id, 
+       COALESCE(SP.shop_name, '不确定') AS shop_name, 
+	   P.product_id, P.product_name, P.sale_price
+FROM ShopProduct AS SP RIGHT OUTER JOIN Product AS P
+     ON SP.product_id = P.product_id
+ORDER BY shop_id;
+```
 
-31. 
+31. EXISTS
+> EXIST 只关心记录是否存在，因此返回哪些列都没
+有关系。
+```
+SELECT product_name, sale_price
+FROM Product AS P 
+WHERE EXISTS (SELECT *
+              FROM ShopProduct AS SP 
+              WHERE SP.shop_id = '000C'
+              AND SP.product_id = P.product_id);
+```
+
+32. CASE表达式
+```
+-- 搜索CASE表达式
+CASE WHEN <求值表达式> THEN <表达式>
+WHEN <求值表达式> THEN <表达式>
+WHEN <求值表达式> THEN <表达式>
+.. .
+ELSE <表达式>
+END
+
+-- 简单CASE表达式
+CASE <表达式>
+WHEN <表达式> THEN <表达式>
+WHEN <表达式> THEN <表达式>
+WHEN <表达式> THEN <表达式>
+.. .
+ELSE <表达式>
+END
+```
+
+```
+-- 对按照商品种类计算出的销售单价合计值进行行列转换
+SELECT SUM(CASE WHEN product_type = '衣服'
+           THEN sale_price ELSE 0 END) AS sum_price_clothes,
+       SUM(CASE WHEN product_type = '厨房用具'
+           THEN sale_price ELSE 0 END) AS sum_price_kitchen,
+       SUM(CASE WHEN product_type = '办公用品'
+           THEN sale_price ELSE 0 END) AS sum_price_office
+FROM Product;
+```
+
+```
+-- 统计在某价格区间的个数
+SELECT SUM(CASE WHEN sale_price <= 1000 THEN 1 else 0 end) AS low_price,
+       SUM(CASE WHEN sale_price BETWEEN 1001 AND 3000 THEN 1 else 0 end) AS mid_price,
+	   SUM(CASE WHEN sale_price > 3000 THEN 1 else 0 end) AS high_price
+FROM product;
+```
+> 在对SELECT 语句的结果进行编辑时，CASE 表达式能够发挥较大
+作用。
+
+
+33. 集合运算
+> 1. UNION: 并集，去除重复项
+> 2. UNION ALL: 并集，包含重复项
+> 3. INTERSECT: 交集
+> 4. EXCEPT: 减去另一结果中有的
+
+> 集合运算的特征就是以行方向为单位进行操作。通俗地说，就是进行这些集合
+运算时，会导致记录行数的增减。
+
+34. 联结（JOIN）运算，简单来说，就是将其他表中的列添加过来，进行“添加列”的运算。
+34.1 INNER JOIN
+> 进行内联结时必须使用ON子句，并且要书写在FROM和WHERE之间
+```
+SELECT SP.shop_id, SP.shop_name, SP.product_id, P.product_name, P.sale_price
+FROM ShopProduct AS SP INNER JOIN Product AS P
+     ON SP.product_id = P.product_id
+ORDER BY P.product_name;
+```
+```
+-- 三张表的联结
+SELECT SP.shop_id, SP.shop_name, SP.product_id, P.product_name, P.sale_price, 
+       IP.inventory_quantity, IP.inventory_id
+FROM ShopProduct AS SP INNER JOIN Product AS P
+     ON SP.product_id = P.product_id
+	 INNER JOIN InventoryProduct AS IP
+	 ON SP.product_id = IP.product_id;
+```
+34.2 LEFT/RIGHT OUTER JOIN
+> 用LEFT或RIGHT指定主表，对应项为NULL的也显示
+```
+SELECT SP.shop_id, SP.shop_name, SP.product_id, P.product_name, P.sale_price
+FROM ShopProduct AS SP RIGHT OUTER JOIN Product AS P
+     ON SP.product_id = P.product_id
+```
+
+34.3 CROSS JOIN（笛卡尔积）
+> 交叉联结是所有联结的基础，但是不会实际用到
+```
+SELECT SP.shop_id, SP.shop_name, SP.product_id, P.product_name, P.sale_price
+FROM ShopProduct AS SP CROSS JOIN Product AS P
+```
+
+34.4 过时的语法
+```
+SELECT SP.shop_id, SP.shop_name, SP.product_id, P.product_name, 
+P.sale_price
+FROM ShopProduct SP, Product P
+WHERE SP.product_id = P.product_id
+AND SP.shop_id = '000A';
+```
+
+
+
+
+
 
 
 
