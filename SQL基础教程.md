@@ -380,6 +380,67 @@ WHERE SP.product_id = P.product_id
 AND SP.shop_id = '000A';
 ```
 
+35. 窗口函数
+> 通过 PARTITION BY 分组后的记录集合称为“窗口”。实指“范围”
+
+> 原则上窗口函数只能在 SELECT 子句中使用。
+
+```
+● RANK 函数
+计算排序时，如果存在相同位次的记录，则会跳过之后的位次。
+例）有 3 条记录排在第 1 位时：1 位、1 位、1 位、4 位……
+● DENSE_RANK 函数
+同样是计算排序，即使存在相同位次的记录，也不会跳过之后的位次。
+例）有 3 条记录排在第 1 位时：1 位、1 位、1 位、2 位……
+● ROW_NUMBER 函数
+赋予唯一的连续位次。
+例）有 3 条记录排在第 1 位时：1 位、2 位、3 位、4 位……
+```
+
+```
+SELECT product_name, product_type, sale_price,
+RANK () OVER (PARTITION BY product_type
+              ORDER BY sale_price) AS ranking
+FROM Product;
+```
+```
+SELECT product_name, product_type, sale_price,
+       RANK () OVER (ORDER BY sale_price) AS ranking,
+       DENSE_RANK () OVER (ORDER BY sale_price) AS dense_ranking,
+       ROW_NUMBER () OVER (ORDER BY sale_price) AS row_num
+FROM Product;
+```
+
+- 框架 following 和 preceding
+```
+SELECT product_id, product_name, sale_price,
+       AVG (sale_price) OVER (ORDER BY product_id
+       ROWS BETWEEN 1 PRECEDING AND 
+           1 FOLLOWING) AS moving_avg
+FROM Product;
+```
+
+- 两个order by
+```
+SELECT product_name, product_type, sale_price,
+       RANK () OVER (ORDER BY sale_price) AS ranking
+       FROM Product
+       ORDER BY ranking;
+```
+
+36. GROUPING
+- rollup
+- grouping
+- cube
+- grouping set
+
+
+
+
+
+
+
+
 
 
 
