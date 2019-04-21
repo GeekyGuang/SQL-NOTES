@@ -396,11 +396,11 @@ AND SP.shop_id = '000A';
 赋予唯一的连续位次。
 例）有 3 条记录排在第 1 位时：1 位、2 位、3 位、4 位……
 ```
-
+> 学会使用ORDER BY是关键
 ```
 SELECT product_name, product_type, sale_price,
 RANK () OVER (PARTITION BY product_type
-              ORDER BY sale_price) AS ranking
+              ORDER BY sale_price) AS ranking  -- RANK()必须有ORDER BY
 FROM Product;
 ```
 ```
@@ -411,12 +411,19 @@ SELECT product_name, product_type, sale_price,
 FROM Product;
 ```
 
+```
+select product_id, product_name, sale_price,
+       -- 如果没有ORDER BY则会计算全部总价，有则计算到自己为止的总价
+       sum(sale_price) over(ORDER BY product_id) as current_sum
+from product;
+```
+
 - 框架 following 和 preceding
 ```
 SELECT product_id, product_name, sale_price,
        AVG (sale_price) OVER (ORDER BY product_id
-       ROWS BETWEEN 1 PRECEDING AND 
-           1 FOLLOWING) AS moving_avg
+                              ROWS BETWEEN 1 PRECEDING AND 
+                                   1 FOLLOWING) AS moving_avg
 FROM Product;
 ```
 
@@ -427,12 +434,45 @@ SELECT product_name, product_type, sale_price,
        FROM Product
        ORDER BY ranking;
 ```
+> 代码一定要自己敲一遍，自己动手改动才会真的理解
 
 36. GROUPING
-- rollup
-- grouping
-- cube
-- grouping set
+- ROLLUP
+```
+select product_type, sum(sale_price) as sum_price
+from product
+group by rollup(product_type);
+
+-- 一次计算出不同聚合组合的结果
+```
+
+```
+-- 用GROUPING函数表示超级分组记录，是则为1，否则为0
+SELECT GROUPING(product_type) AS product_type, 
+       GROUPING(regist_date) AS regist_date, sum(sale_price) as sum_price
+from product
+group by rollup(product_type, regist_date);
+```
+
+```
+-- 替换1和0
+SELECT CASE WHEN GROUPING(product_type) = 1 
+            THEN '商品种类 合计'
+			ELSE product_type END as product_type,
+	   CASE WHEN GROUPING(regist_date) = 1
+	        THEN '登记日期 合计'
+
+    -- CASE所有分支的返回类型必须一致，所以用cast转换
+			ELSE cast(regist_date as varchar(16)) end as regist_date,
+       sum(sale_price) as sum_price
+from product
+group by rollup(product_type, regist_date);
+```
+- CUBE: 返回所有可能组合的结果
+- GROUPING SETS: 返回个别条件对应的结果，
+
+
+
 
 
 
