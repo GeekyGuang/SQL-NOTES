@@ -84,8 +84,12 @@ FROM Product;
 使用GROUP BY子句时，SELECT子句中不能出现聚合键之外的列名。
 GROUP BY必须有其确定的意义
 
+> 使用GROUP BY往往是因为要使用聚合函数
+
 18. 使用HAVING 子句时SELECT 语句的顺序
 > SELECT → FROM → WHERE → GROUP BY → HAVING
+
+> HAVING是以聚合函数为筛选条件
 
 19. 
 > WHERE 子句 = 指定行所对应的条件
@@ -104,17 +108,23 @@ ORDER BY sp, id;  -- 对多个列先后顺序排序
 ```
 
 21. INSERT省略一列未赋值，若未设定默认值，则会插入null。
+> 显示方式插入默认值 insert into xx values(.., DEFAULT, ..); --用default关键字
 
 22. INSERT INTO ... SELECT复制查询的数据插入到另一张表
 ```
 -- 将商品表中的数据复制到商品复制表中
-INSERT INTO ProductCopy (product_id, product_name, product_type, 
+INSERT INTO ProductCopy (product_id, product_name, product_type, 
 sale_price, purchase_price, regist_date)
-SELECT product_id, product_name, product_type, sale_price, 
+SELECT product_id, product_name, product_type, sale_price, 
 purchase_price, regist_date
 FROM Product;
 ```
 > 复制表时有可能违反主键约束
+
+```
+SELECT XXX INTO XXX FROM XXX
+-- 把查询复制到一张新表，有#前缀的是临时表 
+```
 
 23. DELETE
 ```
