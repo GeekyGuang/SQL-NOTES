@@ -105,6 +105,44 @@ SELECT std_id,
 FROM StudentClub
 GROUP BY std_id 
 ```
+```
+-- CASE是表达式，其值可以作为条件
+-- 比较两个值
+SELECT keys,
+       CASE WHEN x > y THEN x 
+	        ELSE y END AS greatest
+FROM Greatests
+-- 比较三个值
+SELECT keys,
+       CASE WHEN (CASE WHEN x > y THEN x ELSE y END) < z THEN z 
+	        ELSE (CASE WHEN x > y THEN x ELSE y END) END
+			AS greatest
+FROM Greatests
+```
+```
+SELECT CASE WHEN sex = '1' THEN '男'
+            WHEN sex = '2' THEN '女'
+	   ELSE NULL END AS 性别,
+	   SUM(population) AS 全国,
+	   SUM(CASE WHEN pref_name = '爱媛' THEN population ELSE 0 END) AS 爱媛,
+	   SUM(CASE WHEN pref_name = '德岛' THEN population ELSE 0 END) AS 德岛,
+	   SUM(CASE WHEN pref_name = '香川' THEN population ELSE 0 END) AS 香川,
+	   SUM(CASE WHEN pref_name = '高知' THEN population ELSE 0 END) AS 高知,
+	   SUM(CASE WHEN pref_name IN ('爱媛','德岛','香川','高知') THEN population ELSE 0 END) AS 四国
+FROM PopTbl2					   
+GROUP BY sex
+```
+```
+-- 在ORDER BY中使用case表达式指定排列顺序
+SELECT keys 
+FROM Greatests
+ORDER BY CASE 
+           WHEN keys = 'B' THEN 1
+           WHEN keys = 'A' THEN 2
+			     WHEN keys = 'D' THEN 3
+			     WHEN keys = 'C' THEN 4
+			     ELSE NULL END;
+```
 
 
 
