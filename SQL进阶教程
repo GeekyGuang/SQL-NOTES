@@ -1,0 +1,25 @@
+1. CASE表达式
+```
+SELECT CASE pref_name 
+       WHEN '爱媛' THEN '四国'  -- 注意WHEN之间没有逗号
+	   WHEN '高知' THEN '四国'
+	   WHEN '香川' THEN '四国'
+	   WHEN '德岛' THEN '四国'
+	   WHEN '福冈' THEN '九州'
+	   WHEN '佐贺' THEN '九州'
+	   WHEN '长崎' THEN '九州'  
+	   ELSE '其他' END
+       AS district,
+	   SUM(population)
+FROM dbo.PopTbl
+GROUP BY CASE pref_name        -- GROUP BY里用CASE分组
+       WHEN '爱媛' THEN '四国'
+	   WHEN '高知' THEN '四国'
+	   WHEN '香川' THEN '四国'
+	   WHEN '德岛' THEN '四国'
+	   WHEN '福冈' THEN '九州'
+	   WHEN '佐贺' THEN '九州'
+	   WHEN '长崎' THEN '九州'
+	   ELSE '其他' END;
+```
+
