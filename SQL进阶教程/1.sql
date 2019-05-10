@@ -55,8 +55,34 @@ WHERE p_key IN ('a','b')
 
 
 
+-- 表的匹配
+SELECT course_name,
+       CASE WHEN course_id IN (SELECT course_id FROM opencourses
+	                           WHERE month = '200706') THEN 'o'
+							   ELSE 'x' END AS June,
+	   CASE WHEN course_id IN (SELECT course_id FROM opencourses
+	                           WHERE month = '200707') THEN 'o'
+							   ELSE 'x' END AS July,
+	   CASE WHEN course_id IN (SELECT course_id FROM opencourses
+	                           WHERE month = '200708') THEN 'o'
+							   ELSE 'x' END AS Auguest
+FROM coursemaster;
 
-
+-- 表的匹配用 EXISTS
+SELECT course_name,
+       CASE WHEN EXISTS (SELECT course_id FROM OpenCourses oc
+	                     WHERE month = '200706' 
+						 AND cm.course_id = oc.course_id) THEN 'o'   -- 不要被关联子查询的名字吓到,其实含义很明确
+			ELSE 'x' END AS June,
+       CASE WHEN EXISTS (SELECT course_id FROM OpenCourses oc
+	                     WHERE month = '200707' 
+						 AND cm.course_id = oc.course_id) THEN 'o'
+			ELSE 'x' END AS July,
+       CASE WHEN EXISTS (SELECT course_id FROM OpenCourses oc
+	                     WHERE month = '200708' 
+						 AND cm.course_id = oc.course_id) THEN 'o'
+			ELSE 'x' END AS Auguest
+FROM coursemaster cm
 
 
 
