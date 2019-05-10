@@ -1,5 +1,6 @@
 1. CASE表达式
 ```
+-- 先替换，后分组
 SELECT CASE pref_name 
        WHEN '爱媛' THEN '四国'  -- 注意WHEN之间没有逗号
 	   WHEN '高知' THEN '四国'
@@ -8,8 +9,7 @@ SELECT CASE pref_name
 	   WHEN '福冈' THEN '九州'
 	   WHEN '佐贺' THEN '九州'
 	   WHEN '长崎' THEN '九州'  
-	   ELSE '其他' END
-       AS district,
+	   ELSE '其他' END AS district,
 	   SUM(population)
 FROM dbo.PopTbl
 GROUP BY CASE pref_name        -- GROUP BY里用CASE分组
@@ -20,19 +20,30 @@ GROUP BY CASE pref_name        -- GROUP BY里用CASE分组
 	   WHEN '福冈' THEN '九州'
 	   WHEN '佐贺' THEN '九州'
 	   WHEN '长崎' THEN '九州'
-	   ELSE '其他' END;
+	   ELSE '其他' END;  --注意这里不需要别名
 ```
-
 ```
--- 行列转换
+-- WHEN条件的排他性
+SELECT CASE WHEN population < 100 THEN '01'
+            WHEN population < 200 THEN '02'
+			      WHEN population < 300 THEN '03'
+			      ELSE '04' END AS pop_class,
+	   COUNT(*)
+FROM PopTbl
+GROUP BY CASE WHEN population < 100 THEN '01'
+              WHEN population < 200 THEN '02'
+			        WHEN population < 300 THEN '03'
+			        ELSE '04' END;
+```
+```
+-- 行转列,用case条件筛选
 SELECT pref_name,
-       SUM(CASE WHEN sex='1' THEN population ELSE 0 END) AS 男,
-	   SUM(CASE WHEN sex='2' THEN population ELSE 0 END) AS 女
-FROM dbo.PopTbl2
-GROUP BY pref_name;
+       SUM(CASE WHEN sex = '1' THEN population ELSE 0 END) AS '男',
+	     SUM(CASE WHEN sex = '2' THEN population ELSE 0 END) AS '女'
+FROM PopTbl2
+GROUP BY pref_name
 ```
 
-```
 -- CHECK约束
 CONSTRAINT check_salary CHECK
   ( CASE WHEN sex = '2'
@@ -43,7 +54,6 @@ CONSTRAINT check_salary CHECK
 
 ```
 -- 在update中使用case条件
--- 若用多条update..when语句，则后面的update会把前面的覆盖掉
 UPDATE Salaries 
 SET salary = CASE WHEN salary >= 300000 THEN salary * 0.9
                   WHEN salary >= 250000 AND salary < 280000 THEN salary * 1.2
