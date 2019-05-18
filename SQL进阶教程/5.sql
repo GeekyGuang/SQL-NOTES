@@ -1,3 +1,4 @@
+/*1. 制作交叉表*/
 -- 用外连接制作交叉表
 SELECT c0.name,
        CASE WHEN c1.name IS NOT NULL THEN 'o' ELSE 'x' END AS 'SQL入门',
@@ -14,9 +15,12 @@ FROM (SELECT DISTINCT name FROM courses) c0
 
 -- CASE表达式+子查询
 SELECT c0.name,
-       CASE WHEN c0.name IN (SELECT name FROM courses WHERE course = 'SQL入门') THEN 'o' ELSE 'x' END AS 'SQL入门',
-	   CASE WHEN c0.name IN (SELECT name FROM courses WHERE course = 'UNIX基础') THEN 'o' ELSE 'x' END AS 'UNIX基础',
-	   CASE WHEN c0.name IN (SELECT name FROM courses WHERE course = 'Java中级') THEN 'o' ELSE 'x' END AS 'Java中级'
+       CASE WHEN c0.name IN (SELECT name FROM courses WHERE course = 'SQL入门') 
+	        THEN 'o' ELSE 'x' END AS 'SQL入门',
+	   CASE WHEN c0.name IN (SELECT name FROM courses WHERE course = 'UNIX基础') 
+	        THEN 'o' ELSE 'x' END AS 'UNIX基础',
+	   CASE WHEN c0.name IN (SELECT name FROM courses WHERE course = 'Java中级') 
+	        THEN 'o' ELSE 'x' END AS 'Java中级'
 FROM (SELECT DISTINCT name FROM courses) c0
 
 
@@ -30,3 +34,21 @@ SELECT name,
 	        THEN 'o' ELSE 'x' END AS 'Java中级'
 FROM courses 
 GROUP BY name
+
+/*2.汇总重复项于一列*/
+CREATE VIEW Children(child)
+AS SELECT child_1 FROM Personnel
+UNION
+SELECT child_2 FROM Personnel
+UNION
+SELECT child_3 FROM Personnel;
+
+SELECT emp.employee, children.child 
+FROM personnel emp
+     LEFT JOIN children
+	 ON children.child IN (emp.child_1, emp.child_2, emp.child_3)  -- 分别与多个列关联用IN
+
+
+/*交叉表里制作嵌套式表侧栏*/
+/* 在交叉表里制作嵌套式表侧栏 */
+
